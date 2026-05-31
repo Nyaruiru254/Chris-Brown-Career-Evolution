@@ -214,3 +214,68 @@ DROP TABLE spotify_dataset;
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
+SELECT
+	*
+FROM
+	chrisbrown_discography cd 
+WHERE 
+	cd.track_name LIKE '%deuces%'
+	OR cd.track_name LIKE '%forever%'
+	OR cd.track_name LIKE '%gimme that%'
+	OR cd.track_name LIKE '%go crazy%'
+	OR cd.track_name LIKE '%kiss kiss%'
+	OR cd.track_name LIKE '%look at me now%'
+	OR cd.track_name LIKE '%loyal%'
+	OR cd.track_name LIKE '%new flame%'
+	OR cd.track_name LIKE '%next to you%'
+	OR cd.track_name LIKE '%no guidance%'
+	OR cd.track_name LIKE '%poppin%'
+	OR cd.track_name LIKE '%run it!%'
+	OR cd.track_name LIKE '%say goodbye%'
+	OR cd.track_name LIKE '%take you down%'
+	OR cd.track_name LIKE '%under the influence%'
+	OR cd.track_name LIKE '%wet the bed%'
+	OR cd.track_name LIKE '%with you%'
+	OR cd.track_name LIKE '%yeah 3x%'
+	OR cd.track_name LIKE '%yo (excuse me miss)%'
+ORDER BY 
+	track_name ASC;
+
+SELECT
+	*
+FROM
+	public.chrisbrown_datosmerged;
+
+SELECT
+	track_name,
+	CASE
+		WHEN track_name LIKE '%(feat. %'
+		THEN TRIM(SUBSTRING(track_name FROM 1 FOR POSITION('(feat. ' IN track_name) -1))
+		ELSE track_name
+	END AS clean_track_name
+FROM
+	public.chrisbrown_datosmerged;
+
+UPDATE public.chrisbrown_datosmerged
+SET 
+	track_name = CASE
+	             	WHEN track_name LIKE '%(feat. %'
+	             	THEN TRIM(SUBSTRING(track_name FROM 1 FOR POSITION('(feat. ' IN track_name) -1))
+	             	ELSE track_name
+	             END;
+
+SELECT 
+	*
+FROM 
+	public.chrisbrown_song_spotify_streams_kworb
+
+SELECT
+	Song Title,
+	CASE
+		WHEN Song_title LIKE '%(feat. %'
+		THEN TRIM(SUBSTRING(Song Title FROM 1 FOR POSITION('(feat. ' IN Song Title) -1))
+		ELSE Song Title
+	END AS clean_song_title
+FROM
+	public.chrisbrown_song_spotify_streams_kworb;
+	
