@@ -269,13 +269,80 @@ SELECT
 FROM 
 	public.chrisbrown_song_spotify_streams_kworb
 
+SELECT column_name 
+FROM information_schema.columns
+WHERE table_name = 'chrisbrown_song_spotify_streams_kworb';
+
+ALTER TABLE chrisbrown_song_spotify_streams_kworb
+RENAME COLUMN "ï»¿Song_title" TO Song_title;
+
 SELECT
-	Song Title,
+	"song_title",
 	CASE
-		WHEN Song_title LIKE '%(feat. %'
-		THEN TRIM(SUBSTRING(Song Title FROM 1 FOR POSITION('(feat. ' IN Song Title) -1))
-		ELSE Song Title
+		WHEN "song_title" LIKE '%(feat. %'
+		THEN TRIM(SUBSTRING("song_title" FROM 1 FOR POSITION('(feat. ' IN "song_title") -1))
+		ELSE "song_title"
 	END AS clean_song_title
 FROM
 	public.chrisbrown_song_spotify_streams_kworb;
+
+UPDATE public.chrisbrown_song_spotify_streams_kworb
+SET 
+	song_title = CASE 
+		                WHEN "song_title" LIKE '% (feat. %'
+		             	THEN TRIM(SUBSTRING("song_title" FROM 1 FOR POSITION('(feat. ' IN "song_title") -1))
+		             	ELSE "song_title"
+	               END;
+
+-- 1. Update titles with 'ft.'
+UPDATE public.chrisbrown_song_spotify_streams_kworb
+SET song_title = 
+	TRIM(SUBSTRING(song_title FROM 1 FOR POSITION('ft. ' IN song_title) - 1))
+WHERE 
+	song_title LIKE 'Body On Me %';
+
+-- 2. Update titles with '[feat.'
+UPDATE public.chrisbrown_song_spotify_streams_kworb
+SET song_title = 
+	TRIM(SUBSTRING(song_title FROM 1 FOR POSITION('[feat. ' IN song_title) - 1))
+WHERE 
+	song_title LIKE '% [feat. %';
+
+-- 3. Update titles with 'feat.'
+UPDATE public.chrisbrown_song_spotify_streams_kworb
+SET song_title = 
+	TRIM(SUBSTRING(song_title FROM 1 FOR POSITION('feat. ' IN song_title) - 1))
+WHERE 
+	song_title LIKE 'All My Life %';
+
+-- 4. Update titles with '[with Future'
+UPDATE public.chrisbrown_song_spotify_streams_kworb
+SET song_title = 
+	TRIM(SUBSTRING(song_title FROM 1 FOR POSITION('[with Future ' IN song_title) - 1))
+WHERE 
+	song_title LIKE 'Superhero %';
+
+SELECT 
+	*
+FROM
+	public.chrisbrown_song_spotify_streams_kworb;
 	
+SELECT 
+	*
+FROM 
+	public.chrisbrown_spotifydataset
+	
+SELECT
+	"track_name",
+	CASE
+		WHEN "track_name" LIKE '% (feat. %'
+		THEN TRIM(SUBSTRING("track_name" FROM 1 FOR POSITION('(feat. ' IN "track_name") -1))
+		ELSE "track_name"
+	END AS clean_track_name
+FROM
+	public.chrisbrown_spotifydataset;
+	
+SELECT 	
+	*
+FROM 
+	public.chrisbrown_youtube_song_views;
