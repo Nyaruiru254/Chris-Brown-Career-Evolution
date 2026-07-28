@@ -1,11 +1,22 @@
 <p align="center">
-  <img src="chris_brown_albums.jpeg" alt="Chris Brown Albums Cover" width="100%">
+  <img src="Chris Brown.jpg" alt="Chris Brown Albums Cover" width="100%">
 </p>
 
 # Chris Brown Streaming Analysis: 20-Year Career Resilience & Audio Evolution
 
 ## 📌 Project Overview
 This project explores how Chris Brown has maintained commercial and streaming success across a two-decade career despite recurring public controversies. By examining audio characteristics (danceability, valence, tempo) alongside streaming volume and historical chart movements, this analysis maps out his commercial evolution and eras of peak engagement.
+
+---
+
+## 🚧 Project Status
+| Phase | Status |
+| :--- | :--- |
+| Data Collection | ✅ Complete |
+| Data Cleaning | ✅ Complete |
+| SQL Analysis | 🔄 In Progress |
+| Power BI Dashboard | ⏳ Upcoming |
+| GitHub Documentation | 🔄 In Progress |
 
 ---
 
@@ -22,7 +33,6 @@ This project explores how Chris Brown has maintained commercial and streaming su
 
 ### Datasets Profile
 
-
 | File Name | Data Source | Inventory Contents |
 | :--- | :--- | :--- |
 | `chrisbrown_song_spotify_streams_kworb_20260520` | Kworb.net | Song-level Spotify streaming tallies |
@@ -31,13 +41,25 @@ This project explores how Chris Brown has maintained commercial and streaming su
 | `chrisbrown_album_peakchartpositions_wikipedia` | Wikipedia | Peak chart performance across 11 countries & RIAA certification data |
 | `chrisbrown_billboard_hot100_billboard_20260520` | Billboard.com | Song-level Hot 100 histories (debut dates, peak ranks, weeks active) |
 | `cleaned_dataset`<br>`spotify_dataset`<br>`datos_merged_1986_2023` | Kaggle | Historical audio profile features (danceability, energy, valence, tempo) |
-| `chrisbrown_discography_with_genres` | Self-Compiled | Structured discography of 13 albums, 333+ tracks, labels, and genres |
+| `chrisbrown_discography_with_genres` | Self-Compiled | Structured discography of 12 solo studio albums, 333+ tracks, labels, and genres |
 
 ### Collection Methodology
 * **Streaming & Views Data:** Manually extracted from Kworb.net streaming tables into Excel format as a static snapshot.
 * **Chart Positions:** Captured from Wikipedia's curated discographies to establish permanent historical markers.
 * **Billboard Metrics:** Scraped from Billboard.com historical archives tracking 125 unique charting songs.
 * **Genre Classifications:** Built from the ground up by verifying tracklists on YouTube/Wikipedia alongside AI-assisted structural classification.
+
+---
+
+## 🔧 Tools & Technologies
+| Layer | Tool |
+| :--- | :--- |
+| Data Collection | Excel, Manual Extraction |
+| Database | PostgreSQL |
+| GUI | DBeaver |
+| Data Cleaning | SQL, Excel |
+| Version Control | Git & GitHub |
+| Visualization | Power BI (upcoming) |
 
 ---
 
@@ -48,6 +70,15 @@ This project explores how Chris Brown has maintained commercial and streaming su
 * **Footnote Pruning:** Erased Wikipedia text footnotes (e.g., `[1]`, `[2]`) via bulk text formatting.
 * **Calculated Fields:** Split messy label cells into discrete data items using `MID` and `FIND` string search methods.
 * **Standardization:** Fixed date columns into a predictable `dd/mm/yyyy` sequence and expanded shortened country codes into full text names.
+
+### SQL Cleaning Layer (PostgreSQL via DBeaver)
+* **Title Standardization:** Removed featured artist credits from song titles across all tables using `SUBSTRING`, `POSITION` and `TRIM` functions, isolating core song names for consistent cross-table joining.
+* **Featured Artist Extraction:** Created a dedicated `features` column in `chrisbrown_discography` to preserve featured artist data separately from song titles.
+* **Principal Artist Filtering:** Removed rows where Chris Brown appears as a featured artist rather than lead artist using `NOT LIKE 'Chris Brown%'` pattern matching.
+* **Deduplication:** Eliminated duplicate song entries across tables using `ROW_NUMBER()` window functions partitioned by song title, retaining only the highest-viewed or most relevant version.
+* **Non-Music Content Removal:** Deleted behind-the-scenes footage, tour vlogs, interview clips, Grammy performances, remix variants and other non-original-song entries from the YouTube views table using targeted `LIKE` pattern deletions.
+* **Encoding Fixes:** Resolved UTF-8 BOM character artifacts in column names using `ALTER TABLE RENAME COLUMN`.
+* **Case Normalization:** Converted all song title columns to lowercase using `LOWER()` for uniform cross-table matching.
 
 ### Database Ingestion Strategy (DBeaver & PostgreSQL)
 To circumvent common file import errors, the raw data files were pushed into PostgreSQL via DBeaver using a specialized fallback layout:
