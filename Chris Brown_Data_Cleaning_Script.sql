@@ -476,15 +476,7 @@ WHERE
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
-/*
-SECTION: Cleaning the chrisbrown_song_spotify_streams_kworb table
-
-Purpose: Before joining this table with my other datasets, i need to:
-1. Inspect the table structure and data
-2. Fix encoding issues in the column name
-3. Standardize song titles by removing featured artist information
-   so that song names match consistently across all tables
-*/
+-- SECTION: Cleaning the chrisbrown_song_spotify_streams_kworb table
 
 -- Initial inspection of the table
 -- Viewing all data to understand the structure and content of the table
@@ -610,6 +602,13 @@ FROM
 UPDATE public.chrisbrown_song_spotify_streams_kworb
 SET 
 	song_title = LOWER(song_title);
+
+-- Subsection 5
+-- Getting rid of commas in the values on 'Streams' and 'Daily' and convering the data type into BIGINT
+UPDATE public.chrisbrown_song_spotify_streams_kworb
+SET
+	"Streams" = REPLACE("Streams", ',', '')::BIGINT,
+	"Daily" = REPLACE("Daily", ',', '')::BIGINT;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -1167,13 +1166,14 @@ ORDER BY
 	video, row_number;
 
 DELETE FROM public.chrisbrown_youtube_song_views
-WHERE ctid NOT IN (
-    SELECT DISTINCT ON 
-    	(video) ctid
-    FROM 
-    	public.chrisbrown_youtube_song_views
-    ORDER BY video, "Views" DESC
-);
+WHERE 
+	ctid NOT IN (
+	    SELECT DISTINCT ON 
+	    	(video) ctid
+	    FROM 
+	    	public.chrisbrown_youtube_song_views
+	    ORDER BY video, "Views" DESC
+	);
 
 /*
 Subsection 16
@@ -1199,7 +1199,35 @@ DELETE FROM public.chrisbrown_youtube_song_views
 WHERE 
 	video = 'liquor -';
 
+-- Subsection 17
+--  Getting rid of commas in the values on 'Views' and 'Yesterday' and convering the data type into BIGINT
+UPDATE public.chrisbrown_youtube_song_views
+SET 
+	"Views" = REPLACE("Views"::TEXT, ',', '')::BIGINT,
+	"Yesterday" = REPLACE("Yesterday"::TEXT, ',', '')::BIGINT;
+
+UPDATE public.chrisbrown_youtube_song_views
+SET 
+	"Views" = REPLACE("Views"::TEXT, ',', '')::BIGINT;
+
 ---------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------
 
+-- Cleaning public.chrisbrown_album_spotify_streams_kworb table
+
+-- Subsection 5
+-- Getting rid of commas in the values on 'Streams' and 'Daily' and convering the data type into BIGINT
+UPDATE public.chrisbrown_album_spotify_streams_kworb
+SET 
+	"Streams" = REPLACE("Streams", ',', '')::BIGINT,
+	"Daily" = REPLACE("Daily", ',', '')::BIGINT;
+
+-----------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------
+
+SELECT 	
+	*
+FROM 
+	public.chrisbrown_youtube_song_views;
+ 
 
