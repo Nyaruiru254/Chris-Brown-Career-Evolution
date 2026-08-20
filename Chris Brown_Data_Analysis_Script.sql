@@ -58,9 +58,127 @@ FROM
 ORDER BY 
 	release_date ASC;
 
+SELECT  
+	*
+FROM
+	public.chrisbrown_discography;
+
 SELECT 
-	album
+	* 
 FROM 
-	public.chrisbrown_album_chartpositions;
-WHERE album IS NULL OR album = '';
-	
+	public.chrisbrown_song_spotify_streams_kworb;
+
+
+SELECT 
+	public.chrisbrown_discography.track_name,
+	public.chrisbrown_song_spotify_streams_kworb.song_title,
+	public.chrisbrown_youtube_song_views.video
+FROM 
+	public.chrisbrown_discography
+LEFT JOIN 
+	public.chrisbrown_song_spotify_streams_kworb
+ON 
+	public.chrisbrown_discography.track_name = public.chrisbrown_song_spotify_streams_kworb.song_title
+LEFT JOIN 
+	public.chrisbrown_youtube_song_views 
+ON 
+	public.chrisbrown_youtube_song_views.video = public.chrisbrown_discography.track_name;
+
+SELECT 
+    video 
+FROM
+    public.chrisbrown_youtube_song_views
+WHERE 
+    video ILIKE ANY (ARRAY[
+        '%gimme%',
+        '%poppin%',
+        '%drunk%',
+        '%came%',
+        '%no bs%',
+        '%beg%',
+        '%should%',
+        '%go crazy%',
+        '%no way%',
+        '%up to you%',
+        '%champion%',
+        '%2012%',
+        '%early%',
+        '%all back%',
+        '%ya man%',
+        '%lost%',
+        '%be gone%',
+        '%time for%',
+        '%drown%',
+        '%stuck on stupid%',
+        '%lady in a glass%',
+        '%young love%',
+        '%do better%',
+        '%add me in%',
+        '%body shots%',
+        '%101%',
+        '%stereotype%',
+        '%winner%',
+        '%biggest fan%',
+        '%you%',
+        '%bassline%',
+        '%just fine%',
+        '%oh my love%',
+        '%sing like me%',
+        '%4 years old%',
+        '%mirage%',
+        '%is this love%',
+        '%paper%',
+        '%kiss kiss%',
+        '%i wanna be%',
+        '%see you around%',
+        '%party hard%',
+        '%down%',
+        '%remember my name%',
+        '%damage%',
+        '%trumpet lights%',
+        '%touch me%',
+        '%brown skin%',
+        '%say it with me%',
+        '%take my time%',
+        '%tell somebody%',
+        '%picture perfect%',
+        '%my name%',
+        '%free run%',
+        '%leave me alone%',
+        '%call ya%',
+        '%love the girls%',
+        '%run it%',
+        '%i''ll go%',
+        '%chase our love%',
+        '%i need this%',
+        '%heart ain''t a brain%',
+        '%thank you%',
+        '%help me%',
+        '%what i do%',
+        '%i.y.a%',
+        '%hold up%',
+        '%throwed%',
+        '%no lights%',
+        '%the 80''s%',
+        '%pass out%',
+        '%gimme whatcha got%',
+        '%intro%',
+        '%in my head%',
+        '%lottery%',
+        '%mama%',
+        '%lucky me%',
+        '%for ur love%',
+        '%get at ya%',
+        '%blue jeans%',
+        '%girlfriend%',
+        '%wait for you%',
+        '%nice%',
+        '%f* and party%',
+        '%gotta be ur man%',
+        '%let it go%',
+        '%bomb%',
+        '%graffiti%',
+        '%famous girl%',
+        '%fallin down%',
+        '%'
+    ]);
