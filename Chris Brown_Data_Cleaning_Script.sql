@@ -610,6 +610,7 @@ SET
 	"Streams" = REPLACE("Streams", ',', '')::BIGINT,
 	"Daily" = REPLACE("Daily", ',', '')::BIGINT;
 
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1210,12 +1211,32 @@ UPDATE public.chrisbrown_youtube_song_views
 SET 
 	"Views" = REPLACE("Views"::TEXT, ',', '')::BIGINT;
 
+-- Subsection 18
+-- Fix 'kiss kiss (' and remove trailing brackets/spaces
+UPDATE public.chrisbrown_youtube_song_views
+SET video = TRIM(REPLACE(video, 'kiss kiss (', 'kiss kiss'))
+WHERE 
+	video LIKE 'kiss kiss%';
+
+-- Subsection 19
+-- Fix 'run it!' and remove the exclamation mark (or any trailing punctuation)
+UPDATE public.chrisbrown_youtube_song_views -- (or your exact table name)
+SET video = TRIM(TRAILING '!' FROM video)
+WHERE 
+	video LIKE 'run it%';
+
+--Subsection 20
+-- Deleting duplicate row with run it song that has lesser views
+DELETE FROM public.chrisbrown_youtube_song_views
+WHERE video ILIKE 'run it%' 
+  AND "Views" = 12787796;
+
 ---------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------
 
 -- Cleaning public.chrisbrown_album_spotify_streams_kworb table
 
--- Subsection 5
+-- Subsection 1
 -- Getting rid of commas in the values on 'Streams' and 'Daily' and convering the data type into BIGINT
 UPDATE public.chrisbrown_album_spotify_streams_kworb
 SET 
