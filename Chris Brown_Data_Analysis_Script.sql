@@ -258,3 +258,76 @@ WHERE
     d.album IS NOT NULL
 ORDER BY
     d.album, s."Streams" DESC;
+
+
+-- Calculate IQR-to-median ratio per album to measure relative streaming
+-- consistency: a higher ratio means more variation among an album's songs,
+-- a lower ratio means streams are more evenly spread across the tracklist
+SELECT
+    d.album,
+    ROUND(PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY s."Streams")) AS q1,
+    ROUND(PERCENTILE_CONT(0.5)  WITHIN GROUP (ORDER BY s."Streams")) AS median,
+    ROUND(PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY s."Streams")) AS q3,
+    ROUND(
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY s."Streams")
+        - PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY s."Streams")
+    ) AS iqr,
+    ROUND(
+        (
+            (
+                PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY s."Streams")
+                - PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY s."Streams")
+            )
+            / NULLIF(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY s."Streams"), 0)
+        )::numeric
+    , 2) AS iqr_to_median_ratio
+FROM
+    public.chrisbrown_song_spotify_streams_kworb s
+LEFT JOIN
+    public.chrisbrown_discography d
+ON
+    d.track_name = s.song_title
+WHERE
+    d.album IS NOT NULL
+GROUP BY
+    d.album
+ORDER BY
+    iqr_to_median_ratio DESC;
+
+-- Statistical summary of song streaming performance per album (Spotify):
+-- quartile-based stats (median, Q1, Q3, IQR, IQR-to-median ratio)
+-- plus standard-deviation-based stats (avg, stddev, stddev-to-avg ratio)
+CREATE VIEW public.chrisbrown_album_stream_stats_spotify AS
+SELECT
+    d.album,
+    ROUND(PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY s."Streams")) AS q1,
+    ROUND(PERCENTILE_CONT(0.5)  WITHIN GROUP (ORDER BY s."Streams")) AS median,
+    ROUND(PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY s."Streams")) AS q3,
+    ROUND(
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY s."Streams")
+        - PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY s."Streams")
+    ) AS iqr,
+    ROUND(
+        (
+            (
+                PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY s."Streams")
+                - PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY s."Streams")
+            )
+            / NULLIF(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY s."Streams"), 0)
+        )::numeric
+    , 2) AS iqr_to_median_ratio,
+    ROUND(AVG(s."Streams")) AS avg_streams,
+    ROUND(STDDEV(s."Streams")) AS stddev_streams,
+    ROUND(
+        (STDDEV(s."Streams") / NULLIF(AVG(s."Streams"), 0))::numeric
+    , 2) AS stddev_to_avg_ratio
+FROM
+    public.chrisbrown_song_spotify_streams_kworb s
+LEFT JOIN
+    public.chrisbrown_discography d
+ON
+    d.track_name = s.song_title
+WHERE
+    d.album IS NOT NULL
+GROUP BY
+    d.album;
